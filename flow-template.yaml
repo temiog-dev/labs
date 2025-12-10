@@ -1,0 +1,11 @@
+version: 1
+trail:
+  artifacts:
+    - name: application
+      attestations:
+        - name: unit-tests
+          type: junit
+    - name: docker-image
+      attestations:
+        - name: sbom
+          type: generic
