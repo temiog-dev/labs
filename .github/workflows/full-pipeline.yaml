@@ -12,6 +12,8 @@ env:
   IMAGE: ${{ github.repository_owner }}/${{ github.event.repository.name }}
   BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
   COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+  KOSLI_API_TOKEN: ${{ secrets.KOSLI_API_TOKEN }}
+  KOSLI_ORG: ${{ vars.KOSLI_ORG }}
   
 jobs:
   Build:
@@ -19,7 +21,26 @@ jobs:
     container: gradle:8.0.1-jdk11
     steps:
       - name: Clone down repository
-        uses: actions/checkout@v6       
+        uses: actions/checkout@v6 
+      #Your new additions
+
+      - name: Setup Kosli CLI
+        uses: kosli-dev/setup-cli-action@v2
+        with:
+          version:
+            2.11.32
+
+      - name: Create/Update Flow
+        run: |
+          kosli create flow ${APP_NAME}-pipeline \
+            --description "CI/CD pipeline for ${APP_NAME} application" \
+            --use-empty-template
+
+      - name: Begin Trail
+        run: |
+          kosli begin trail ${GIT_COMMIT} \
+            --flow ${APP_NAME}-pipeline \
+            --description "Build ${BUILD_NUMBER}: ${GIT_BRANCH}"      
       - name: Build application
         run: bash ci/build-app.sh
       - name: Test
