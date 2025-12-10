@@ -231,14 +231,23 @@ jobs:
       with:
         version:
           2.11.32
+
+    - name: Update Kosli policy
+      run: kosli create policy labs-prod-requirements .kosli-policy.yml
+    - name: Attach policy to environment
+      run: kosli attach policy labs-prod-requirements --environment labs-prod
     - name: Assert Compliance
       run: |
         IMAGE_NAME="ghcr.io/${IMAGE}:latest"
         kosli assert artifact ${IMAGE_NAME} \
           --artifact-type oci \
           --flow ${APP_NAME}-pipeline  
-          
+
     - name: Deploy to production
       run: bash ci/start-application.sh
+
+    - name: Kosli snapshot environment
+      run: kosli snapshot docker labs-prod 
+      
     - name: stop production environment
       run: bash ci/stop-application.sh

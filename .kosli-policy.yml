@@ -1,0 +1,11 @@
+_schema: https://kosli.com/schemas/policy/environment/v1
+
+artifacts:
+  provenance:
+    required: true  # All artifacts must be part of a Flow
+  
+  attestations:
+    - name: unit-tests  # Must have unit test attestation
+      type: junit
+    - name: sbom  # Must have SBOM attestation
+      type: "*"  # Any attestation type
